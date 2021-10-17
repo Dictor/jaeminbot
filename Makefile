@@ -7,4 +7,4 @@ info:
 
 build:
 	@echo "[jaeminbot build]\nbuild information : ${GIT_TAG} - ${GIT_HASH} (${BUILD_DATE})"
-	@go build -v -x -ldflags "-X main.gitTag=${GIT_TAG} -X main.gitHash=${GIT_HASH} -X main.buildDate=${BUILD_DATE}"
+	@go build -x -ldflags "-X main.gitTag=${GIT_TAG} -X main.gitHash=${GIT_HASH} -X main.buildDate=${BUILD_DATE}"
