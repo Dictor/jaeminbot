@@ -19,6 +19,8 @@ func (Command) Fields() []ent.Field {
 		field.String("keyword").
 			Unique().
 			NotEmpty(),
+		field.String("detail").
+			Optional(),
 		field.Time("created_at").
 			Default(func() time.Time {
 				return time.Now()

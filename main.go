@@ -7,7 +7,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/jaeminbot/ent"
+	"github.com/dictor/jaeminbot/ent"
 	_ "github.com/mattn/go-sqlite3"
 	"github.com/namsral/flag"
 	"github.com/sirupsen/logrus"
@@ -17,6 +17,8 @@ var (
 	Logger                     *logrus.Logger
 	gitTag, gitHash, buildDate string // build flags
 	Client                     *ent.Client
+	ClientContext              context.Context
+	ClientContextCancel        context.CancelFunc
 )
 
 func mustNoError(action string, err error) {
@@ -44,6 +46,7 @@ func main() {
 
 	Client, err := ent.Open("sqlite3", fmt.Sprintf("file:%s?_fk=1", storePath))
 	mustNoError("opening db", err)
+	ClientContext, ClientContextCancel = context.WithCancel(context.Background())
 	defer Client.Close()
 	mustNoError("migrationing db", Client.Schema.Create(context.Background()))
 
