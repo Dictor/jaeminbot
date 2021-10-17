@@ -36,6 +36,6 @@ func (Command) Fields() []ent.Field {
 // Edges of the Command.
 func (Command) Edges() []ent.Edge {
 	return []ent.Edge{
-		edge.To("logs", Command.Type),
+		edge.To("logs", ResultLog.Type),
 	}
 }
