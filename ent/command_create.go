@@ -27,6 +27,20 @@ func (cc *CommandCreate) SetKeyword(s string) *CommandCreate {
 	return cc
 }
 
+// SetDetail sets the "detail" field.
+func (cc *CommandCreate) SetDetail(s string) *CommandCreate {
+	cc.mutation.SetDetail(s)
+	return cc
+}
+
+// SetNillableDetail sets the "detail" field if the given value is not nil.
+func (cc *CommandCreate) SetNillableDetail(s *string) *CommandCreate {
+	if s != nil {
+		cc.SetDetail(*s)
+	}
+	return cc
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (cc *CommandCreate) SetCreatedAt(t time.Time) *CommandCreate {
 	cc.mutation.SetCreatedAt(t)
@@ -224,6 +238,14 @@ func (cc *CommandCreate) createSpec() (*Command, *sqlgraph.CreateSpec) {
 			Column: command.FieldKeyword,
 		})
 		_node.Keyword = value
+	}
+	if value, ok := cc.mutation.Detail(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: command.FieldDetail,
+		})
+		_node.Detail = value
 	}
 	if value, ok := cc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

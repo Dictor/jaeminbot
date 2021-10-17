@@ -35,6 +35,7 @@ type CommandMutation struct {
 	typ           string
 	id            *int
 	keyword       *string
+	detail        *string
 	created_at    *time.Time
 	updated_at    *time.Time
 	creator       *string
@@ -161,6 +162,55 @@ func (m *CommandMutation) OldKeyword(ctx context.Context) (v string, err error) 
 // ResetKeyword resets all changes to the "keyword" field.
 func (m *CommandMutation) ResetKeyword() {
 	m.keyword = nil
+}
+
+// SetDetail sets the "detail" field.
+func (m *CommandMutation) SetDetail(s string) {
+	m.detail = &s
+}
+
+// Detail returns the value of the "detail" field in the mutation.
+func (m *CommandMutation) Detail() (r string, exists bool) {
+	v := m.detail
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDetail returns the old "detail" field's value of the Command entity.
+// If the Command object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CommandMutation) OldDetail(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDetail is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDetail requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDetail: %w", err)
+	}
+	return oldValue.Detail, nil
+}
+
+// ClearDetail clears the value of the "detail" field.
+func (m *CommandMutation) ClearDetail() {
+	m.detail = nil
+	m.clearedFields[command.FieldDetail] = struct{}{}
+}
+
+// DetailCleared returns if the "detail" field was cleared in this mutation.
+func (m *CommandMutation) DetailCleared() bool {
+	_, ok := m.clearedFields[command.FieldDetail]
+	return ok
+}
+
+// ResetDetail resets all changes to the "detail" field.
+func (m *CommandMutation) ResetDetail() {
+	m.detail = nil
+	delete(m.clearedFields, command.FieldDetail)
 }
 
 // SetCreatedAt sets the "created_at" field.
@@ -380,9 +430,12 @@ func (m *CommandMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CommandMutation) Fields() []string {
-	fields := make([]string, 0, 5)
+	fields := make([]string, 0, 6)
 	if m.keyword != nil {
 		fields = append(fields, command.FieldKeyword)
+	}
+	if m.detail != nil {
+		fields = append(fields, command.FieldDetail)
 	}
 	if m.created_at != nil {
 		fields = append(fields, command.FieldCreatedAt)
@@ -406,6 +459,8 @@ func (m *CommandMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case command.FieldKeyword:
 		return m.Keyword()
+	case command.FieldDetail:
+		return m.Detail()
 	case command.FieldCreatedAt:
 		return m.CreatedAt()
 	case command.FieldUpdatedAt:
@@ -425,6 +480,8 @@ func (m *CommandMutation) OldField(ctx context.Context, name string) (ent.Value,
 	switch name {
 	case command.FieldKeyword:
 		return m.OldKeyword(ctx)
+	case command.FieldDetail:
+		return m.OldDetail(ctx)
 	case command.FieldCreatedAt:
 		return m.OldCreatedAt(ctx)
 	case command.FieldUpdatedAt:
@@ -448,6 +505,13 @@ func (m *CommandMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetKeyword(v)
+		return nil
+	case command.FieldDetail:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDetail(v)
 		return nil
 	case command.FieldCreatedAt:
 		v, ok := value.(time.Time)
@@ -506,7 +570,11 @@ func (m *CommandMutation) AddField(name string, value ent.Value) error {
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
 func (m *CommandMutation) ClearedFields() []string {
-	return nil
+	var fields []string
+	if m.FieldCleared(command.FieldDetail) {
+		fields = append(fields, command.FieldDetail)
+	}
+	return fields
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
@@ -519,6 +587,11 @@ func (m *CommandMutation) FieldCleared(name string) bool {
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
 func (m *CommandMutation) ClearField(name string) error {
+	switch name {
+	case command.FieldDetail:
+		m.ClearDetail()
+		return nil
+	}
 	return fmt.Errorf("unknown Command nullable field %s", name)
 }
 
@@ -528,6 +601,9 @@ func (m *CommandMutation) ResetField(name string) error {
 	switch name {
 	case command.FieldKeyword:
 		m.ResetKeyword()
+		return nil
+	case command.FieldDetail:
+		m.ResetDetail()
 		return nil
 	case command.FieldCreatedAt:
 		m.ResetCreatedAt()

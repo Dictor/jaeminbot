@@ -13,6 +13,8 @@ const (
 	FieldID = "id"
 	// FieldKeyword holds the string denoting the keyword field in the database.
 	FieldKeyword = "keyword"
+	// FieldDetail holds the string denoting the detail field in the database.
+	FieldDetail = "detail"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
 	FieldCreatedAt = "created_at"
 	// FieldUpdatedAt holds the string denoting the updated_at field in the database.
@@ -36,6 +38,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldKeyword,
+	FieldDetail,
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldCreator,

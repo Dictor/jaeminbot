@@ -12,6 +12,7 @@ var (
 	CommandsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "keyword", Type: field.TypeString, Unique: true},
+		{Name: "detail", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "creator", Type: field.TypeString},

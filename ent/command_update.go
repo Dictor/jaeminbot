@@ -34,6 +34,26 @@ func (cu *CommandUpdate) SetKeyword(s string) *CommandUpdate {
 	return cu
 }
 
+// SetDetail sets the "detail" field.
+func (cu *CommandUpdate) SetDetail(s string) *CommandUpdate {
+	cu.mutation.SetDetail(s)
+	return cu
+}
+
+// SetNillableDetail sets the "detail" field if the given value is not nil.
+func (cu *CommandUpdate) SetNillableDetail(s *string) *CommandUpdate {
+	if s != nil {
+		cu.SetDetail(*s)
+	}
+	return cu
+}
+
+// ClearDetail clears the value of the "detail" field.
+func (cu *CommandUpdate) ClearDetail() *CommandUpdate {
+	cu.mutation.ClearDetail()
+	return cu
+}
+
 // SetCreatedAt sets the "created_at" field.
 func (cu *CommandUpdate) SetCreatedAt(t time.Time) *CommandUpdate {
 	cu.mutation.SetCreatedAt(t)
@@ -215,6 +235,19 @@ func (cu *CommandUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: command.FieldKeyword,
 		})
 	}
+	if value, ok := cu.mutation.Detail(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: command.FieldDetail,
+		})
+	}
+	if cu.mutation.DetailCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: command.FieldDetail,
+		})
+	}
 	if value, ok := cu.mutation.CreatedAt(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeTime,
@@ -319,6 +352,26 @@ type CommandUpdateOne struct {
 // SetKeyword sets the "keyword" field.
 func (cuo *CommandUpdateOne) SetKeyword(s string) *CommandUpdateOne {
 	cuo.mutation.SetKeyword(s)
+	return cuo
+}
+
+// SetDetail sets the "detail" field.
+func (cuo *CommandUpdateOne) SetDetail(s string) *CommandUpdateOne {
+	cuo.mutation.SetDetail(s)
+	return cuo
+}
+
+// SetNillableDetail sets the "detail" field if the given value is not nil.
+func (cuo *CommandUpdateOne) SetNillableDetail(s *string) *CommandUpdateOne {
+	if s != nil {
+		cuo.SetDetail(*s)
+	}
+	return cuo
+}
+
+// ClearDetail clears the value of the "detail" field.
+func (cuo *CommandUpdateOne) ClearDetail() *CommandUpdateOne {
+	cuo.mutation.ClearDetail()
 	return cuo
 }
 
@@ -525,6 +578,19 @@ func (cuo *CommandUpdateOne) sqlSave(ctx context.Context) (_node *Command, err e
 			Type:   field.TypeString,
 			Value:  value,
 			Column: command.FieldKeyword,
+		})
+	}
+	if value, ok := cuo.mutation.Detail(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: command.FieldDetail,
+		})
+	}
+	if cuo.mutation.DetailCleared() {
+		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Column: command.FieldDetail,
 		})
 	}
 	if value, ok := cuo.mutation.CreatedAt(); ok {

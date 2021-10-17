@@ -100,6 +100,13 @@ func Keyword(v string) predicate.Command {
 	})
 }
 
+// Detail applies equality check predicate on the "detail" field. It's identical to DetailEQ.
+func Detail(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldDetail), v))
+	})
+}
+
 // CreatedAt applies equality check predicate on the "created_at" field. It's identical to CreatedAtEQ.
 func CreatedAt(v time.Time) predicate.Command {
 	return predicate.Command(func(s *sql.Selector) {
@@ -236,6 +243,131 @@ func KeywordEqualFold(v string) predicate.Command {
 func KeywordContainsFold(v string) predicate.Command {
 	return predicate.Command(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldKeyword), v))
+	})
+}
+
+// DetailEQ applies the EQ predicate on the "detail" field.
+func DetailEQ(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldDetail), v))
+	})
+}
+
+// DetailNEQ applies the NEQ predicate on the "detail" field.
+func DetailNEQ(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldDetail), v))
+	})
+}
+
+// DetailIn applies the In predicate on the "detail" field.
+func DetailIn(vs ...string) predicate.Command {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Command(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldDetail), v...))
+	})
+}
+
+// DetailNotIn applies the NotIn predicate on the "detail" field.
+func DetailNotIn(vs ...string) predicate.Command {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Command(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldDetail), v...))
+	})
+}
+
+// DetailGT applies the GT predicate on the "detail" field.
+func DetailGT(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldDetail), v))
+	})
+}
+
+// DetailGTE applies the GTE predicate on the "detail" field.
+func DetailGTE(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldDetail), v))
+	})
+}
+
+// DetailLT applies the LT predicate on the "detail" field.
+func DetailLT(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldDetail), v))
+	})
+}
+
+// DetailLTE applies the LTE predicate on the "detail" field.
+func DetailLTE(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldDetail), v))
+	})
+}
+
+// DetailContains applies the Contains predicate on the "detail" field.
+func DetailContains(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldDetail), v))
+	})
+}
+
+// DetailHasPrefix applies the HasPrefix predicate on the "detail" field.
+func DetailHasPrefix(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldDetail), v))
+	})
+}
+
+// DetailHasSuffix applies the HasSuffix predicate on the "detail" field.
+func DetailHasSuffix(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldDetail), v))
+	})
+}
+
+// DetailIsNil applies the IsNil predicate on the "detail" field.
+func DetailIsNil() predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.IsNull(s.C(FieldDetail)))
+	})
+}
+
+// DetailNotNil applies the NotNil predicate on the "detail" field.
+func DetailNotNil() predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.NotNull(s.C(FieldDetail)))
+	})
+}
+
+// DetailEqualFold applies the EqualFold predicate on the "detail" field.
+func DetailEqualFold(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldDetail), v))
+	})
+}
+
+// DetailContainsFold applies the ContainsFold predicate on the "detail" field.
+func DetailContainsFold(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldDetail), v))
 	})
 }
 
