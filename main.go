@@ -33,6 +33,7 @@ func mustNoError(action string, err error) {
 func main() {
 	var (
 		botToken, storePath string
+		err                 error
 	)
 
 	Logger = logrus.New()
@@ -44,7 +45,7 @@ func main() {
 
 	mustNoError("starting bot", startDiscordBot(botToken))
 
-	Client, err := ent.Open("sqlite3", fmt.Sprintf("file:%s?_fk=1", storePath))
+	Client, err = ent.Open("sqlite3", fmt.Sprintf("file:%s?_fk=1", storePath))
 	mustNoError("opening db", err)
 	ClientContext, ClientContextCancel = context.WithCancel(context.Background())
 	defer Client.Close()
