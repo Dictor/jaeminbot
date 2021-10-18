@@ -227,7 +227,7 @@ func (cu *CommandUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   command.Table,
 			Columns: command.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeString,
 				Column: command.FieldID,
 			},
 		},
@@ -573,7 +573,7 @@ func (cuo *CommandUpdateOne) sqlSave(ctx context.Context) (_node *Command, err e
 			Table:   command.Table,
 			Columns: command.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeString,
 				Column: command.FieldID,
 			},
 		},

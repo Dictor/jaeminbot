@@ -15,7 +15,7 @@ import (
 type Command struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID int `json:"id,omitempty"`
+	ID string `json:"id,omitempty"`
 	// Keyword holds the value of the "keyword" field.
 	Keyword string `json:"keyword,omitempty"`
 	// Detail holds the value of the "detail" field.
@@ -58,9 +58,7 @@ func (*Command) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case command.FieldID:
-			values[i] = new(sql.NullInt64)
-		case command.FieldKeyword, command.FieldDetail, command.FieldCreator, command.FieldServer, command.FieldCode:
+		case command.FieldID, command.FieldKeyword, command.FieldDetail, command.FieldCreator, command.FieldServer, command.FieldCode:
 			values[i] = new(sql.NullString)
 		case command.FieldCreatedAt, command.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -80,11 +78,11 @@ func (c *Command) assignValues(columns []string, values []interface{}) error {
 	for i := range columns {
 		switch columns[i] {
 		case command.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value.Valid {
+				c.ID = value.String
 			}
-			c.ID = int(value.Int64)
 		case command.FieldKeyword:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field keyword", values[i])

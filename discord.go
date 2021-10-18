@@ -6,14 +6,14 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/dictor/jaeminbot/ent"
-	"github.com/dictor/jaeminbot/ent/command"
 	"github.com/sirupsen/logrus"
 )
 
 type (
 	editMessageContext struct {
-		Message *discordgo.Message
-		Keyword string
+		OriginalMessage *discordgo.MessageCreate
+		TriggerMessage  *discordgo.Message
+		Keyword         string
 	}
 
 	vmMessageContext struct {
@@ -21,6 +21,8 @@ type (
 		Message *discordgo.MessageCreate
 		Command *ent.Command
 	}
+
+	UserNotFound error
 )
 
 var (
@@ -56,7 +58,7 @@ func discordErrorHandler(s *discordgo.Session, m *discordgo.MessageCreate, err e
 	Logger.WithError(err).Error("error caused during processing message")
 	logDiscordSendResult(s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
 		Type:        discordgo.EmbedTypeArticle,
-		Title:       "이런! 오류가 발생했어요 ㅠㅠ",
+		Title:       ":dizzy_face: 이런! 오류가 발생했어요 ㅠㅠ",
 		Description: fmt.Sprintf("`%s`", err),
 	}))
 }
@@ -108,6 +110,7 @@ func discordMessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			},
 			Description: "원하는 기능의 명령어를 채팅방에 입력하면 됩니다. (<>는 필수, []는 선택 입력 항목입니다.)",
 		}))
+		return
 	case 2:
 		switch msg[1] {
 		case "명령어":
@@ -128,8 +131,10 @@ func discordMessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 				Title:       fmt.Sprintf("총 %d개의 명령어가 있어요.", len(commands)),
 				Description: detail,
 			}))
+			return
 		case "오류":
 			logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, "오류 확인 기능은 아직 준비중이에요!"))
+			return
 		}
 	case 3:
 		switch msg[1] {
@@ -137,6 +142,7 @@ func discordMessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			switch msg[2] {
 			case "추가":
 				logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, "명령어 추가는 `재민쿤 명령어 추가 <명령어 호출 키워드>`로 가능합니다."))
+				return
 			case "저장":
 				editCtx, ok := editMessage[m.Author.ID]
 				if !ok {
@@ -145,16 +151,24 @@ func discordMessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 				}
 				exist, cmd, err := getCommandByKeyword(editCtx.Keyword, m.GuildID)
 				if !exist {
-					logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, "어라? 편집중이던 명령어를 찾을 수 없습니다!"))
+					logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, "어라? 편집 중이던 명령어를 찾을 수 없습니다!"))
 					discordErrorHandler(s, m, err)
 					delete(editMessage, m.Author.ID)
 					return
 				}
-				cmd, err = cmd.Update().SetCode(editCtx.Message.Content).Save(ClientContext)
+				msg, err := findCodeReply(s, m, editCtx)
 				if err != nil {
 					discordErrorHandler(s, m, err)
+					return
 				}
-				logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%d 바이트의 용량의 코드로 `%s` 명령어를 업데이트 했습니다.", len(cmd.Code), cmd.Keyword)))
+
+				newCmd, err := cmd.Update().SetCode(msg.Content).Save(ClientContext)
+				if err != nil {
+					discordErrorHandler(s, m, err)
+					return
+				}
+				logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%d 바이트의 용량의 코드로 `%s` 명령어를 업데이트 했습니다.", len(newCmd.Code), newCmd.Keyword)))
+				return
 			}
 		}
 	case 4:
@@ -163,6 +177,7 @@ func discordMessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			switch msg[2] {
 			case "추가":
 				cmd, err := Client.Command.Create().
+					SetID(fmt.Sprintf("%s-%s", msg[3], m.GuildID)).
 					SetCreator(m.Author.ID).
 					SetKeyword(msg[3]).
 					SetCode("").
@@ -173,8 +188,9 @@ func discordMessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 					return
 				}
 				logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`%s` 호출 키워드의 명령어가 `%s` 사용자에 의해 추가되었습니다. 명령어 코드 작성을 위해서는 `재민쿤 명령어 코드 %s` 명령어를 사용해주세요.", cmd.Keyword, cmd.Creator, cmd.Keyword)))
+				return
 			case "코드":
-				cmd, err := Client.Command.Query().Where(command.Keyword(msg[3])).Only(ClientContext)
+				_, cmd, err := getCommandByKeyword(msg[3], m.GuildID)
 				if err != nil {
 					if _, ok := err.(*ent.NotFoundError); ok {
 						logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`%s` 호출 키워드의 명령어를 찾을 수 없습니다!", msg[3])))
@@ -183,32 +199,56 @@ func discordMessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 					}
 					return
 				}
-				logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, "제가 보낸 아래 코드 메세지를 수정하고 `재민쿤 명령어 저장`을 호출해주세요"))
-				code := cmd.Code
-				if code == "" {
-					code = "/* your code here! use args array for accessing argument, send(msg) function for sending message. code will be executed on ES5.1 VM  */"
-				}
-				editMsg, err := s.ChannelMessageSend(m.ChannelID, code)
+
+				trigMsg, err := s.ChannelMessageSend(m.ChannelID, "이 메세지의 답장으로 수정할 코드를 보내고 `재민쿤 명령어 저장`을 호출해주세요")
+				logDiscordSendResult(trigMsg, err)
+				logDiscordSendResult(s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
+					Type:        discordgo.EmbedTypeArticle,
+					Title:       fmt.Sprintf("`%s` 명령어의 코드", msg[3]),
+					Description: fmt.Sprintf("```\n%s\n```", cmd.Code),
+				}))
 				if err != nil {
 					discordErrorHandler(s, m, err)
 				}
 				editMessage[m.Author.ID] = editMessageContext{
-					Message: editMsg,
-					Keyword: msg[3],
+					OriginalMessage: m,
+					TriggerMessage:  trigMsg,
+					Keyword:         msg[3],
 				}
+				return
 			}
 		}
-	default:
-		exist, cmd, err := getCommandByKeyword(msg[1], m.GuildID)
-		if exist {
-			arg := msg[2:]
-			runCode(vmMessageContext{
-				Session: s,
-				Message: m,
-				Command: cmd,
-			}, arg)
-		} else {
+	}
+	exist, cmd, _ := getCommandByKeyword(msg[1], m.GuildID)
+	if exist {
+		arg := msg[2:]
+		err := runCode(vmMessageContext{
+			Session: s,
+			Message: m,
+			Command: cmd,
+		}, arg)
+		if err != nil {
 			discordErrorHandler(s, m, err)
 		}
+	} else {
+		logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, "등록되지 않은 명령어에요!:sob:"))
 	}
+}
+
+func findCodeReply(s *discordgo.Session, m *discordgo.MessageCreate, ctx editMessageContext) (*discordgo.Message, error) {
+	msgs, err := s.ChannelMessages(m.ChannelID, 100, "", ctx.TriggerMessage.ID, "")
+	if err != nil {
+		return nil, err
+	}
+
+	me, err := s.User("@me")
+	if err != nil {
+		return nil, err
+	}
+	for _, m := range msgs {
+		if m.Author.ID == ctx.OriginalMessage.Author.ID && m.Type == discordgo.MessageTypeReply && m.Mentions[0].ID == me.ID {
+			return m, nil
+		}
+	}
+	return nil, fmt.Errorf("답장 메세지를 찾을 수 없습니다")
 }

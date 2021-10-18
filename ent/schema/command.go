@@ -16,8 +16,8 @@ type Command struct {
 // Fields of the Command.
 func (Command) Fields() []ent.Field {
 	return []ent.Field{
+		field.String("id").Unique(),
 		field.String("keyword").
-			Unique().
 			NotEmpty(),
 		field.String("detail").
 			Optional(),

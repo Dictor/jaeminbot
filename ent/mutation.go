@@ -33,7 +33,7 @@ type CommandMutation struct {
 	config
 	op            Op
 	typ           string
-	id            *int
+	id            *string
 	keyword       *string
 	detail        *string
 	created_at    *time.Time
@@ -70,7 +70,7 @@ func newCommandMutation(c config, op Op, opts ...commandOption) *CommandMutation
 }
 
 // withCommandID sets the ID field of the mutation.
-func withCommandID(id int) commandOption {
+func withCommandID(id string) commandOption {
 	return func(m *CommandMutation) {
 		var (
 			err   error
@@ -120,9 +120,15 @@ func (m CommandMutation) Tx() (*Tx, error) {
 	return tx, nil
 }
 
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Command entities.
+func (m *CommandMutation) SetID(id string) {
+	m.id = &id
+}
+
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *CommandMutation) ID() (id int, exists bool) {
+func (m *CommandMutation) ID() (id string, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -768,8 +774,8 @@ type ResultLogMutation struct {
 	level          *string
 	log            *string
 	clearedFields  map[string]struct{}
-	command        map[int]struct{}
-	removedcommand map[int]struct{}
+	command        map[string]struct{}
+	removedcommand map[string]struct{}
 	clearedcommand bool
 	done           bool
 	oldValue       func(context.Context) (*ResultLog, error)
@@ -928,9 +934,9 @@ func (m *ResultLogMutation) ResetLog() {
 }
 
 // AddCommandIDs adds the "command" edge to the Command entity by ids.
-func (m *ResultLogMutation) AddCommandIDs(ids ...int) {
+func (m *ResultLogMutation) AddCommandIDs(ids ...string) {
 	if m.command == nil {
-		m.command = make(map[int]struct{})
+		m.command = make(map[string]struct{})
 	}
 	for i := range ids {
 		m.command[ids[i]] = struct{}{}
@@ -948,9 +954,9 @@ func (m *ResultLogMutation) CommandCleared() bool {
 }
 
 // RemoveCommandIDs removes the "command" edge to the Command entity by IDs.
-func (m *ResultLogMutation) RemoveCommandIDs(ids ...int) {
+func (m *ResultLogMutation) RemoveCommandIDs(ids ...string) {
 	if m.removedcommand == nil {
-		m.removedcommand = make(map[int]struct{})
+		m.removedcommand = make(map[string]struct{})
 	}
 	for i := range ids {
 		delete(m.command, ids[i])
@@ -959,7 +965,7 @@ func (m *ResultLogMutation) RemoveCommandIDs(ids ...int) {
 }
 
 // RemovedCommand returns the removed IDs of the "command" edge to the Command entity.
-func (m *ResultLogMutation) RemovedCommandIDs() (ids []int) {
+func (m *ResultLogMutation) RemovedCommandIDs() (ids []string) {
 	for id := range m.removedcommand {
 		ids = append(ids, id)
 	}
@@ -967,7 +973,7 @@ func (m *ResultLogMutation) RemovedCommandIDs() (ids []int) {
 }
 
 // CommandIDs returns the "command" edge IDs in the mutation.
-func (m *ResultLogMutation) CommandIDs() (ids []int) {
+func (m *ResultLogMutation) CommandIDs() (ids []string) {
 	for id := range m.command {
 		ids = append(ids, id)
 	}

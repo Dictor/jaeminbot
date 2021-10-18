@@ -33,14 +33,14 @@ func (rlc *ResultLogCreate) SetLog(s string) *ResultLogCreate {
 }
 
 // AddCommandIDs adds the "command" edge to the Command entity by IDs.
-func (rlc *ResultLogCreate) AddCommandIDs(ids ...int) *ResultLogCreate {
+func (rlc *ResultLogCreate) AddCommandIDs(ids ...string) *ResultLogCreate {
 	rlc.mutation.AddCommandIDs(ids...)
 	return rlc
 }
 
 // AddCommand adds the "command" edges to the Command entity.
 func (rlc *ResultLogCreate) AddCommand(c ...*Command) *ResultLogCreate {
-	ids := make([]int, len(c))
+	ids := make([]string, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
@@ -175,7 +175,7 @@ func (rlc *ResultLogCreate) createSpec() (*ResultLog, *sqlgraph.CreateSpec) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: command.FieldID,
 				},
 			},

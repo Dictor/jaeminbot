@@ -110,8 +110,8 @@ func (cq *CommandQuery) FirstX(ctx context.Context) *Command {
 
 // FirstID returns the first Command ID from the query.
 // Returns a *NotFoundError when no Command ID was found.
-func (cq *CommandQuery) FirstID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (cq *CommandQuery) FirstID(ctx context.Context) (id string, err error) {
+	var ids []string
 	if ids, err = cq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -123,7 +123,7 @@ func (cq *CommandQuery) FirstID(ctx context.Context) (id int, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (cq *CommandQuery) FirstIDX(ctx context.Context) int {
+func (cq *CommandQuery) FirstIDX(ctx context.Context) string {
 	id, err := cq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -161,8 +161,8 @@ func (cq *CommandQuery) OnlyX(ctx context.Context) *Command {
 // OnlyID is like Only, but returns the only Command ID in the query.
 // Returns a *NotSingularError when exactly one Command ID is not found.
 // Returns a *NotFoundError when no entities are found.
-func (cq *CommandQuery) OnlyID(ctx context.Context) (id int, err error) {
-	var ids []int
+func (cq *CommandQuery) OnlyID(ctx context.Context) (id string, err error) {
+	var ids []string
 	if ids, err = cq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -178,7 +178,7 @@ func (cq *CommandQuery) OnlyID(ctx context.Context) (id int, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (cq *CommandQuery) OnlyIDX(ctx context.Context) int {
+func (cq *CommandQuery) OnlyIDX(ctx context.Context) string {
 	id, err := cq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -204,8 +204,8 @@ func (cq *CommandQuery) AllX(ctx context.Context) []*Command {
 }
 
 // IDs executes the query and returns a list of Command IDs.
-func (cq *CommandQuery) IDs(ctx context.Context) ([]int, error) {
-	var ids []int
+func (cq *CommandQuery) IDs(ctx context.Context) ([]string, error) {
+	var ids []string
 	if err := cq.Select(command.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -213,7 +213,7 @@ func (cq *CommandQuery) IDs(ctx context.Context) ([]int, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (cq *CommandQuery) IDsX(ctx context.Context) []int {
+func (cq *CommandQuery) IDsX(ctx context.Context) []string {
 	ids, err := cq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -376,7 +376,7 @@ func (cq *CommandQuery) sqlAll(ctx context.Context) ([]*Command, error) {
 
 	if query := cq.withLogs; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[int]*Command, len(nodes))
+		ids := make(map[string]*Command, len(nodes))
 		for _, node := range nodes {
 			ids[node.ID] = node
 			fks = append(fks, node.ID)
@@ -396,10 +396,10 @@ func (cq *CommandQuery) sqlAll(ctx context.Context) ([]*Command, error) {
 				s.Where(sql.InValues(command.LogsPrimaryKey[0], fks...))
 			},
 			ScanValues: func() [2]interface{} {
-				return [2]interface{}{new(sql.NullInt64), new(sql.NullInt64)}
+				return [2]interface{}{new(sql.NullString), new(sql.NullInt64)}
 			},
 			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullInt64)
+				eout, ok := out.(*sql.NullString)
 				if !ok || eout == nil {
 					return fmt.Errorf("unexpected id value for edge-out")
 				}
@@ -407,7 +407,7 @@ func (cq *CommandQuery) sqlAll(ctx context.Context) ([]*Command, error) {
 				if !ok || ein == nil {
 					return fmt.Errorf("unexpected id value for edge-in")
 				}
-				outValue := int(eout.Int64)
+				outValue := eout.String
 				inValue := int(ein.Int64)
 				node, ok := ids[outValue]
 				if !ok {
@@ -461,7 +461,7 @@ func (cq *CommandQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   command.Table,
 			Columns: command.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeString,
 				Column: command.FieldID,
 			},
 		},

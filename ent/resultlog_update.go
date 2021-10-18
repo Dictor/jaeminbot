@@ -40,14 +40,14 @@ func (rlu *ResultLogUpdate) SetLog(s string) *ResultLogUpdate {
 }
 
 // AddCommandIDs adds the "command" edge to the Command entity by IDs.
-func (rlu *ResultLogUpdate) AddCommandIDs(ids ...int) *ResultLogUpdate {
+func (rlu *ResultLogUpdate) AddCommandIDs(ids ...string) *ResultLogUpdate {
 	rlu.mutation.AddCommandIDs(ids...)
 	return rlu
 }
 
 // AddCommand adds the "command" edges to the Command entity.
 func (rlu *ResultLogUpdate) AddCommand(c ...*Command) *ResultLogUpdate {
-	ids := make([]int, len(c))
+	ids := make([]string, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
@@ -66,14 +66,14 @@ func (rlu *ResultLogUpdate) ClearCommand() *ResultLogUpdate {
 }
 
 // RemoveCommandIDs removes the "command" edge to Command entities by IDs.
-func (rlu *ResultLogUpdate) RemoveCommandIDs(ids ...int) *ResultLogUpdate {
+func (rlu *ResultLogUpdate) RemoveCommandIDs(ids ...string) *ResultLogUpdate {
 	rlu.mutation.RemoveCommandIDs(ids...)
 	return rlu
 }
 
 // RemoveCommand removes "command" edges to Command entities.
 func (rlu *ResultLogUpdate) RemoveCommand(c ...*Command) *ResultLogUpdate {
-	ids := make([]int, len(c))
+	ids := make([]string, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
@@ -175,7 +175,7 @@ func (rlu *ResultLogUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: command.FieldID,
 				},
 			},
@@ -191,7 +191,7 @@ func (rlu *ResultLogUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: command.FieldID,
 				},
 			},
@@ -210,7 +210,7 @@ func (rlu *ResultLogUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: command.FieldID,
 				},
 			},
@@ -252,14 +252,14 @@ func (rluo *ResultLogUpdateOne) SetLog(s string) *ResultLogUpdateOne {
 }
 
 // AddCommandIDs adds the "command" edge to the Command entity by IDs.
-func (rluo *ResultLogUpdateOne) AddCommandIDs(ids ...int) *ResultLogUpdateOne {
+func (rluo *ResultLogUpdateOne) AddCommandIDs(ids ...string) *ResultLogUpdateOne {
 	rluo.mutation.AddCommandIDs(ids...)
 	return rluo
 }
 
 // AddCommand adds the "command" edges to the Command entity.
 func (rluo *ResultLogUpdateOne) AddCommand(c ...*Command) *ResultLogUpdateOne {
-	ids := make([]int, len(c))
+	ids := make([]string, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
@@ -278,14 +278,14 @@ func (rluo *ResultLogUpdateOne) ClearCommand() *ResultLogUpdateOne {
 }
 
 // RemoveCommandIDs removes the "command" edge to Command entities by IDs.
-func (rluo *ResultLogUpdateOne) RemoveCommandIDs(ids ...int) *ResultLogUpdateOne {
+func (rluo *ResultLogUpdateOne) RemoveCommandIDs(ids ...string) *ResultLogUpdateOne {
 	rluo.mutation.RemoveCommandIDs(ids...)
 	return rluo
 }
 
 // RemoveCommand removes "command" edges to Command entities.
 func (rluo *ResultLogUpdateOne) RemoveCommand(c ...*Command) *ResultLogUpdateOne {
-	ids := make([]int, len(c))
+	ids := make([]string, len(c))
 	for i := range c {
 		ids[i] = c[i].ID
 	}
@@ -411,7 +411,7 @@ func (rluo *ResultLogUpdateOne) sqlSave(ctx context.Context) (_node *ResultLog, 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: command.FieldID,
 				},
 			},
@@ -427,7 +427,7 @@ func (rluo *ResultLogUpdateOne) sqlSave(ctx context.Context) (_node *ResultLog, 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: command.FieldID,
 				},
 			},
@@ -446,7 +446,7 @@ func (rluo *ResultLogUpdateOne) sqlSave(ctx context.Context) (_node *ResultLog, 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeString,
 					Column: command.FieldID,
 				},
 			},

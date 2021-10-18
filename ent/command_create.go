@@ -87,6 +87,12 @@ func (cc *CommandCreate) SetCode(s string) *CommandCreate {
 	return cc
 }
 
+// SetID sets the "id" field.
+func (cc *CommandCreate) SetID(s string) *CommandCreate {
+	cc.mutation.SetID(s)
+	return cc
+}
+
 // AddLogIDs adds the "logs" edge to the ResultLog entity by IDs.
 func (cc *CommandCreate) AddLogIDs(ids ...int) *CommandCreate {
 	cc.mutation.AddLogIDs(ids...)
@@ -229,8 +235,9 @@ func (cc *CommandCreate) sqlSave(ctx context.Context) (*Command, error) {
 		}
 		return nil, err
 	}
-	id := _spec.ID.Value.(int64)
-	_node.ID = int(id)
+	if _spec.ID.Value != nil {
+		_node.ID = _spec.ID.Value.(string)
+	}
 	return _node, nil
 }
 
@@ -240,11 +247,15 @@ func (cc *CommandCreate) createSpec() (*Command, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: command.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeString,
 				Column: command.FieldID,
 			},
 		}
 	)
+	if id, ok := cc.mutation.ID(); ok {
+		_node.ID = id
+		_spec.ID.Value = id
+	}
 	if value, ok := cc.mutation.Keyword(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -365,10 +376,6 @@ func (ccb *CommandCreateBulk) Save(ctx context.Context) ([]*Command, error) {
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = int(id)
-				}
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {
