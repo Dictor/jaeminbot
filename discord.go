@@ -102,6 +102,7 @@ func discordMessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 				{Name: "도움말", Value: "`재민쿤`", Inline: true},
 				{Name: "명령어 목록", Value: "`재민쿤 명령어`", Inline: true},
 				{Name: "명령어 추가", Value: "`재민쿤 명령어 추가`", Inline: true},
+				{Name: "명령어 코드 수정", Value: "`재민쿤 명령어 코드 <명령어>`", Inline: true},
 				{Name: "명령어 정보", Value: "`재민쿤 <명령어>`", Inline: true},
 				{Name: "명령어 실행", Value: "`재민쿤 <명령어> [인수1] [인수2]...`", Inline: true},
 			},
@@ -171,19 +172,23 @@ func discordMessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 					discordErrorHandler(s, m, err)
 					return
 				}
-				logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`%s` 키워드를 가진 명령어가 `%s` 사용자에 의해 추가되었습니다. 명령어 코드 작성을 위해서는 `재민쿤 명령어 코드` 명령어를 사용해주세요.", cmd.Keyword, cmd.Creator)))
+				logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`%s` 호출 키워드의 명령어가 `%s` 사용자에 의해 추가되었습니다. 명령어 코드 작성을 위해서는 `재민쿤 명령어 코드 %s` 명령어를 사용해주세요.", cmd.Keyword, cmd.Creator, cmd.Keyword)))
 			case "코드":
 				cmd, err := Client.Command.Query().Where(command.Keyword(msg[3])).Only(ClientContext)
 				if err != nil {
 					if _, ok := err.(*ent.NotFoundError); ok {
-						logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`%s` 명령어를 찾을 수 없습니다!", msg[3])))
+						logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`%s` 호출 키워드의 명령어를 찾을 수 없습니다!", msg[3])))
 					} else {
 						discordErrorHandler(s, m, err)
 					}
 					return
 				}
 				logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, "제가 보낸 아래 코드 메세지를 수정하고 `재민쿤 명령어 저장`을 호출해주세요"))
-				editMsg, err := s.ChannelMessageSend(m.ChannelID, cmd.Code)
+				code := cmd.Code
+				if code == "" {
+					code = "/* your code here! use args array for accessing argument, send(msg) function for sending message. code will be executed on ES5.1 VM  */"
+				}
+				editMsg, err := s.ChannelMessageSend(m.ChannelID, code)
 				if err != nil {
 					discordErrorHandler(s, m, err)
 				}
