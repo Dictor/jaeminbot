@@ -26,6 +26,8 @@ type Command struct {
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Creator holds the value of the "creator" field.
 	Creator string `json:"creator,omitempty"`
+	// Server holds the value of the "server" field.
+	Server string `json:"server,omitempty"`
 	// Code holds the value of the "code" field.
 	Code string `json:"code,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -58,7 +60,7 @@ func (*Command) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case command.FieldID:
 			values[i] = new(sql.NullInt64)
-		case command.FieldKeyword, command.FieldDetail, command.FieldCreator, command.FieldCode:
+		case command.FieldKeyword, command.FieldDetail, command.FieldCreator, command.FieldServer, command.FieldCode:
 			values[i] = new(sql.NullString)
 		case command.FieldCreatedAt, command.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -113,6 +115,12 @@ func (c *Command) assignValues(columns []string, values []interface{}) error {
 			} else if value.Valid {
 				c.Creator = value.String
 			}
+		case command.FieldServer:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field server", values[i])
+			} else if value.Valid {
+				c.Server = value.String
+			}
 		case command.FieldCode:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field code", values[i])
@@ -162,6 +170,8 @@ func (c *Command) String() string {
 	builder.WriteString(c.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", creator=")
 	builder.WriteString(c.Creator)
+	builder.WriteString(", server=")
+	builder.WriteString(c.Server)
 	builder.WriteString(", code=")
 	builder.WriteString(c.Code)
 	builder.WriteByte(')')

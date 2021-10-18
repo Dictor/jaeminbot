@@ -31,4 +31,8 @@ func init() {
 	commandDescCreator := commandFields[4].Descriptor()
 	// command.CreatorValidator is a validator for the "creator" field. It is called by the builders before save.
 	command.CreatorValidator = commandDescCreator.Validators[0].(func(string) error)
+	// commandDescServer is the schema descriptor for server field.
+	commandDescServer := commandFields[5].Descriptor()
+	// command.ServerValidator is a validator for the "server" field. It is called by the builders before save.
+	command.ServerValidator = commandDescServer.Validators[0].(func(string) error)
 }

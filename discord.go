@@ -142,7 +142,7 @@ func discordMessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 					logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, "편집 중인 명령어가 없습니다!"))
 					return
 				}
-				exist, cmd, err := getCommandByKeyword(editCtx.Keyword)
+				exist, cmd, err := getCommandByKeyword(editCtx.Keyword, m.GuildID)
 				if !exist {
 					logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, "어라? 편집중이던 명령어를 찾을 수 없습니다!"))
 					discordErrorHandler(s, m, err)
@@ -165,6 +165,7 @@ func discordMessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 					SetCreator(m.Author.ID).
 					SetKeyword(msg[3]).
 					SetCode("").
+					SetServer(m.GuildID).
 					Save(ClientContext)
 				if err != nil {
 					discordErrorHandler(s, m, err)
@@ -193,7 +194,7 @@ func discordMessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			}
 		}
 	default:
-		exist, cmd, err := getCommandByKeyword(msg[1])
+		exist, cmd, err := getCommandByKeyword(msg[1], m.GuildID)
 		if exist {
 			runCode(vmMessageContext{
 				Session: s,

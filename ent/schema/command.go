@@ -31,6 +31,8 @@ func (Command) Fields() []ent.Field {
 			}),
 		field.String("creator").
 			NotEmpty(),
+		field.String("server").
+			NotEmpty(),
 		field.String("code"),
 	}
 }

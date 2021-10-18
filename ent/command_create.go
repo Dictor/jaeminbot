@@ -75,6 +75,12 @@ func (cc *CommandCreate) SetCreator(s string) *CommandCreate {
 	return cc
 }
 
+// SetServer sets the "server" field.
+func (cc *CommandCreate) SetServer(s string) *CommandCreate {
+	cc.mutation.SetServer(s)
+	return cc
+}
+
 // SetCode sets the "code" field.
 func (cc *CommandCreate) SetCode(s string) *CommandCreate {
 	cc.mutation.SetCode(s)
@@ -201,6 +207,14 @@ func (cc *CommandCreate) check() error {
 			return &ValidationError{Name: "creator", err: fmt.Errorf(`ent: validator failed for field "creator": %w`, err)}
 		}
 	}
+	if _, ok := cc.mutation.Server(); !ok {
+		return &ValidationError{Name: "server", err: errors.New(`ent: missing required field "server"`)}
+	}
+	if v, ok := cc.mutation.Server(); ok {
+		if err := command.ServerValidator(v); err != nil {
+			return &ValidationError{Name: "server", err: fmt.Errorf(`ent: validator failed for field "server": %w`, err)}
+		}
+	}
 	if _, ok := cc.mutation.Code(); !ok {
 		return &ValidationError{Name: "code", err: errors.New(`ent: missing required field "code"`)}
 	}
@@ -270,6 +284,14 @@ func (cc *CommandCreate) createSpec() (*Command, *sqlgraph.CreateSpec) {
 			Column: command.FieldCreator,
 		})
 		_node.Creator = value
+	}
+	if value, ok := cc.mutation.Server(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: command.FieldServer,
+		})
+		_node.Server = value
 	}
 	if value, ok := cc.mutation.Code(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

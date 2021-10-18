@@ -88,6 +88,12 @@ func (cu *CommandUpdate) SetCreator(s string) *CommandUpdate {
 	return cu
 }
 
+// SetServer sets the "server" field.
+func (cu *CommandUpdate) SetServer(s string) *CommandUpdate {
+	cu.mutation.SetServer(s)
+	return cu
+}
+
 // SetCode sets the "code" field.
 func (cu *CommandUpdate) SetCode(s string) *CommandUpdate {
 	cu.mutation.SetCode(s)
@@ -207,6 +213,11 @@ func (cu *CommandUpdate) check() error {
 			return &ValidationError{Name: "creator", err: fmt.Errorf("ent: validator failed for field \"creator\": %w", err)}
 		}
 	}
+	if v, ok := cu.mutation.Server(); ok {
+		if err := command.ServerValidator(v); err != nil {
+			return &ValidationError{Name: "server", err: fmt.Errorf("ent: validator failed for field \"server\": %w", err)}
+		}
+	}
 	return nil
 }
 
@@ -267,6 +278,13 @@ func (cu *CommandUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeString,
 			Value:  value,
 			Column: command.FieldCreator,
+		})
+	}
+	if value, ok := cu.mutation.Server(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: command.FieldServer,
 		})
 	}
 	if value, ok := cu.mutation.Code(); ok {
@@ -409,6 +427,12 @@ func (cuo *CommandUpdateOne) SetCreator(s string) *CommandUpdateOne {
 	return cuo
 }
 
+// SetServer sets the "server" field.
+func (cuo *CommandUpdateOne) SetServer(s string) *CommandUpdateOne {
+	cuo.mutation.SetServer(s)
+	return cuo
+}
+
 // SetCode sets the "code" field.
 func (cuo *CommandUpdateOne) SetCode(s string) *CommandUpdateOne {
 	cuo.mutation.SetCode(s)
@@ -535,6 +559,11 @@ func (cuo *CommandUpdateOne) check() error {
 			return &ValidationError{Name: "creator", err: fmt.Errorf("ent: validator failed for field \"creator\": %w", err)}
 		}
 	}
+	if v, ok := cuo.mutation.Server(); ok {
+		if err := command.ServerValidator(v); err != nil {
+			return &ValidationError{Name: "server", err: fmt.Errorf("ent: validator failed for field \"server\": %w", err)}
+		}
+	}
 	return nil
 }
 
@@ -612,6 +641,13 @@ func (cuo *CommandUpdateOne) sqlSave(ctx context.Context) (_node *Command, err e
 			Type:   field.TypeString,
 			Value:  value,
 			Column: command.FieldCreator,
+		})
+	}
+	if value, ok := cuo.mutation.Server(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: command.FieldServer,
 		})
 	}
 	if value, ok := cuo.mutation.Code(); ok {

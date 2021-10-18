@@ -21,6 +21,8 @@ const (
 	FieldUpdatedAt = "updated_at"
 	// FieldCreator holds the string denoting the creator field in the database.
 	FieldCreator = "creator"
+	// FieldServer holds the string denoting the server field in the database.
+	FieldServer = "server"
 	// FieldCode holds the string denoting the code field in the database.
 	FieldCode = "code"
 	// EdgeLogs holds the string denoting the logs edge name in mutations.
@@ -42,6 +44,7 @@ var Columns = []string{
 	FieldCreatedAt,
 	FieldUpdatedAt,
 	FieldCreator,
+	FieldServer,
 	FieldCode,
 }
 
@@ -70,4 +73,6 @@ var (
 	DefaultUpdatedAt func() time.Time
 	// CreatorValidator is a validator for the "creator" field. It is called by the builders before save.
 	CreatorValidator func(string) error
+	// ServerValidator is a validator for the "server" field. It is called by the builders before save.
+	ServerValidator func(string) error
 )

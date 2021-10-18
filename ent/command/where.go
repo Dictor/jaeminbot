@@ -128,6 +128,13 @@ func Creator(v string) predicate.Command {
 	})
 }
 
+// Server applies equality check predicate on the "server" field. It's identical to ServerEQ.
+func Server(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldServer), v))
+	})
+}
+
 // Code applies equality check predicate on the "code" field. It's identical to CodeEQ.
 func Code(v string) predicate.Command {
 	return predicate.Command(func(s *sql.Selector) {
@@ -631,6 +638,117 @@ func CreatorEqualFold(v string) predicate.Command {
 func CreatorContainsFold(v string) predicate.Command {
 	return predicate.Command(func(s *sql.Selector) {
 		s.Where(sql.ContainsFold(s.C(FieldCreator), v))
+	})
+}
+
+// ServerEQ applies the EQ predicate on the "server" field.
+func ServerEQ(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldServer), v))
+	})
+}
+
+// ServerNEQ applies the NEQ predicate on the "server" field.
+func ServerNEQ(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldServer), v))
+	})
+}
+
+// ServerIn applies the In predicate on the "server" field.
+func ServerIn(vs ...string) predicate.Command {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Command(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldServer), v...))
+	})
+}
+
+// ServerNotIn applies the NotIn predicate on the "server" field.
+func ServerNotIn(vs ...string) predicate.Command {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Command(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldServer), v...))
+	})
+}
+
+// ServerGT applies the GT predicate on the "server" field.
+func ServerGT(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldServer), v))
+	})
+}
+
+// ServerGTE applies the GTE predicate on the "server" field.
+func ServerGTE(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldServer), v))
+	})
+}
+
+// ServerLT applies the LT predicate on the "server" field.
+func ServerLT(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldServer), v))
+	})
+}
+
+// ServerLTE applies the LTE predicate on the "server" field.
+func ServerLTE(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldServer), v))
+	})
+}
+
+// ServerContains applies the Contains predicate on the "server" field.
+func ServerContains(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldServer), v))
+	})
+}
+
+// ServerHasPrefix applies the HasPrefix predicate on the "server" field.
+func ServerHasPrefix(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldServer), v))
+	})
+}
+
+// ServerHasSuffix applies the HasSuffix predicate on the "server" field.
+func ServerHasSuffix(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldServer), v))
+	})
+}
+
+// ServerEqualFold applies the EqualFold predicate on the "server" field.
+func ServerEqualFold(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldServer), v))
+	})
+}
+
+// ServerContainsFold applies the ContainsFold predicate on the "server" field.
+func ServerContainsFold(v string) predicate.Command {
+	return predicate.Command(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldServer), v))
 	})
 }
 

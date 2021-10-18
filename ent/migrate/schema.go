@@ -16,6 +16,7 @@ var (
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "creator", Type: field.TypeString},
+		{Name: "server", Type: field.TypeString},
 		{Name: "code", Type: field.TypeString},
 	}
 	// CommandsTable holds the schema information for the "commands" table.

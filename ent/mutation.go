@@ -39,6 +39,7 @@ type CommandMutation struct {
 	created_at    *time.Time
 	updated_at    *time.Time
 	creator       *string
+	server        *string
 	code          *string
 	clearedFields map[string]struct{}
 	logs          map[int]struct{}
@@ -321,6 +322,42 @@ func (m *CommandMutation) ResetCreator() {
 	m.creator = nil
 }
 
+// SetServer sets the "server" field.
+func (m *CommandMutation) SetServer(s string) {
+	m.server = &s
+}
+
+// Server returns the value of the "server" field in the mutation.
+func (m *CommandMutation) Server() (r string, exists bool) {
+	v := m.server
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldServer returns the old "server" field's value of the Command entity.
+// If the Command object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CommandMutation) OldServer(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldServer is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldServer requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldServer: %w", err)
+	}
+	return oldValue.Server, nil
+}
+
+// ResetServer resets all changes to the "server" field.
+func (m *CommandMutation) ResetServer() {
+	m.server = nil
+}
+
 // SetCode sets the "code" field.
 func (m *CommandMutation) SetCode(s string) {
 	m.code = &s
@@ -430,7 +467,7 @@ func (m *CommandMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CommandMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.keyword != nil {
 		fields = append(fields, command.FieldKeyword)
 	}
@@ -445,6 +482,9 @@ func (m *CommandMutation) Fields() []string {
 	}
 	if m.creator != nil {
 		fields = append(fields, command.FieldCreator)
+	}
+	if m.server != nil {
+		fields = append(fields, command.FieldServer)
 	}
 	if m.code != nil {
 		fields = append(fields, command.FieldCode)
@@ -467,6 +507,8 @@ func (m *CommandMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdatedAt()
 	case command.FieldCreator:
 		return m.Creator()
+	case command.FieldServer:
+		return m.Server()
 	case command.FieldCode:
 		return m.Code()
 	}
@@ -488,6 +530,8 @@ func (m *CommandMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldUpdatedAt(ctx)
 	case command.FieldCreator:
 		return m.OldCreator(ctx)
+	case command.FieldServer:
+		return m.OldServer(ctx)
 	case command.FieldCode:
 		return m.OldCode(ctx)
 	}
@@ -533,6 +577,13 @@ func (m *CommandMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetCreator(v)
+		return nil
+	case command.FieldServer:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetServer(v)
 		return nil
 	case command.FieldCode:
 		v, ok := value.(string)
@@ -613,6 +664,9 @@ func (m *CommandMutation) ResetField(name string) error {
 		return nil
 	case command.FieldCreator:
 		m.ResetCreator()
+		return nil
+	case command.FieldServer:
+		m.ResetServer()
 		return nil
 	case command.FieldCode:
 		m.ResetCode()
