@@ -129,8 +129,6 @@ func discordMessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			}))
 		case "오류":
 			logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, "오류 확인 기능은 아직 준비중이에요!"))
-		default:
-			logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, "이해할 수 없는 명령어에요!"))
 		}
 	case 3:
 		switch msg[1] {
@@ -180,8 +178,8 @@ func discordMessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 						logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`%s` 명령어를 찾을 수 없습니다!", msg[3])))
 					} else {
 						discordErrorHandler(s, m, err)
-						return
 					}
+					return
 				}
 				logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, "제가 보낸 아래 코드 메세지를 수정하고 `재민쿤 명령어 저장`을 호출해주세요"))
 				editMsg, err := s.ChannelMessageSend(m.ChannelID, cmd.Code)
