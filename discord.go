@@ -196,11 +196,12 @@ func discordMessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	default:
 		exist, cmd, err := getCommandByKeyword(msg[1], m.GuildID)
 		if exist {
+			arg := msg[2:]
 			runCode(vmMessageContext{
 				Session: s,
 				Message: m,
 				Command: cmd,
-			})
+			}, arg)
 		} else {
 			discordErrorHandler(s, m, err)
 		}
