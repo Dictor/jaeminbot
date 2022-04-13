@@ -33,7 +33,7 @@ func runPythonCode(ctx vmMessageContext, args []string) error {
 		return err
 	}
 
-	mainModule, err := pyCtx.GetModule("main")
+	mainModule, err := pyCtx.GetModule("__main__")
 	if err != nil {
 		return err
 	}
