@@ -35,6 +35,7 @@ type CommandMutation struct {
 	typ           string
 	id            *string
 	keyword       *string
+	language      *string
 	detail        *string
 	created_at    *time.Time
 	updated_at    *time.Time
@@ -169,6 +170,42 @@ func (m *CommandMutation) OldKeyword(ctx context.Context) (v string, err error) 
 // ResetKeyword resets all changes to the "keyword" field.
 func (m *CommandMutation) ResetKeyword() {
 	m.keyword = nil
+}
+
+// SetLanguage sets the "language" field.
+func (m *CommandMutation) SetLanguage(s string) {
+	m.language = &s
+}
+
+// Language returns the value of the "language" field in the mutation.
+func (m *CommandMutation) Language() (r string, exists bool) {
+	v := m.language
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldLanguage returns the old "language" field's value of the Command entity.
+// If the Command object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CommandMutation) OldLanguage(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldLanguage is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldLanguage requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldLanguage: %w", err)
+	}
+	return oldValue.Language, nil
+}
+
+// ResetLanguage resets all changes to the "language" field.
+func (m *CommandMutation) ResetLanguage() {
+	m.language = nil
 }
 
 // SetDetail sets the "detail" field.
@@ -473,9 +510,12 @@ func (m *CommandMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CommandMutation) Fields() []string {
-	fields := make([]string, 0, 7)
+	fields := make([]string, 0, 8)
 	if m.keyword != nil {
 		fields = append(fields, command.FieldKeyword)
+	}
+	if m.language != nil {
+		fields = append(fields, command.FieldLanguage)
 	}
 	if m.detail != nil {
 		fields = append(fields, command.FieldDetail)
@@ -505,6 +545,8 @@ func (m *CommandMutation) Field(name string) (ent.Value, bool) {
 	switch name {
 	case command.FieldKeyword:
 		return m.Keyword()
+	case command.FieldLanguage:
+		return m.Language()
 	case command.FieldDetail:
 		return m.Detail()
 	case command.FieldCreatedAt:
@@ -528,6 +570,8 @@ func (m *CommandMutation) OldField(ctx context.Context, name string) (ent.Value,
 	switch name {
 	case command.FieldKeyword:
 		return m.OldKeyword(ctx)
+	case command.FieldLanguage:
+		return m.OldLanguage(ctx)
 	case command.FieldDetail:
 		return m.OldDetail(ctx)
 	case command.FieldCreatedAt:
@@ -555,6 +599,13 @@ func (m *CommandMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetKeyword(v)
+		return nil
+	case command.FieldLanguage:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetLanguage(v)
 		return nil
 	case command.FieldDetail:
 		v, ok := value.(string)
@@ -658,6 +709,9 @@ func (m *CommandMutation) ResetField(name string) error {
 	switch name {
 	case command.FieldKeyword:
 		m.ResetKeyword()
+		return nil
+	case command.FieldLanguage:
+		m.ResetLanguage()
 		return nil
 	case command.FieldDetail:
 		m.ResetDetail()

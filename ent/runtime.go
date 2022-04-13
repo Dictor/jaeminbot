@@ -19,20 +19,24 @@ func init() {
 	commandDescKeyword := commandFields[1].Descriptor()
 	// command.KeywordValidator is a validator for the "keyword" field. It is called by the builders before save.
 	command.KeywordValidator = commandDescKeyword.Validators[0].(func(string) error)
+	// commandDescLanguage is the schema descriptor for language field.
+	commandDescLanguage := commandFields[2].Descriptor()
+	// command.DefaultLanguage holds the default value on creation for the language field.
+	command.DefaultLanguage = commandDescLanguage.Default.(string)
 	// commandDescCreatedAt is the schema descriptor for created_at field.
-	commandDescCreatedAt := commandFields[3].Descriptor()
+	commandDescCreatedAt := commandFields[4].Descriptor()
 	// command.DefaultCreatedAt holds the default value on creation for the created_at field.
 	command.DefaultCreatedAt = commandDescCreatedAt.Default.(func() time.Time)
 	// commandDescUpdatedAt is the schema descriptor for updated_at field.
-	commandDescUpdatedAt := commandFields[4].Descriptor()
+	commandDescUpdatedAt := commandFields[5].Descriptor()
 	// command.DefaultUpdatedAt holds the default value on creation for the updated_at field.
 	command.DefaultUpdatedAt = commandDescUpdatedAt.Default.(func() time.Time)
 	// commandDescCreator is the schema descriptor for creator field.
-	commandDescCreator := commandFields[5].Descriptor()
+	commandDescCreator := commandFields[6].Descriptor()
 	// command.CreatorValidator is a validator for the "creator" field. It is called by the builders before save.
 	command.CreatorValidator = commandDescCreator.Validators[0].(func(string) error)
 	// commandDescServer is the schema descriptor for server field.
-	commandDescServer := commandFields[6].Descriptor()
+	commandDescServer := commandFields[7].Descriptor()
 	// command.ServerValidator is a validator for the "server" field. It is called by the builders before save.
 	command.ServerValidator = commandDescServer.Validators[0].(func(string) error)
 }

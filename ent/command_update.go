@@ -34,6 +34,20 @@ func (cu *CommandUpdate) SetKeyword(s string) *CommandUpdate {
 	return cu
 }
 
+// SetLanguage sets the "language" field.
+func (cu *CommandUpdate) SetLanguage(s string) *CommandUpdate {
+	cu.mutation.SetLanguage(s)
+	return cu
+}
+
+// SetNillableLanguage sets the "language" field if the given value is not nil.
+func (cu *CommandUpdate) SetNillableLanguage(s *string) *CommandUpdate {
+	if s != nil {
+		cu.SetLanguage(*s)
+	}
+	return cu
+}
+
 // SetDetail sets the "detail" field.
 func (cu *CommandUpdate) SetDetail(s string) *CommandUpdate {
 	cu.mutation.SetDetail(s)
@@ -246,6 +260,13 @@ func (cu *CommandUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: command.FieldKeyword,
 		})
 	}
+	if value, ok := cu.mutation.Language(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: command.FieldLanguage,
+		})
+	}
 	if value, ok := cu.mutation.Detail(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -370,6 +391,20 @@ type CommandUpdateOne struct {
 // SetKeyword sets the "keyword" field.
 func (cuo *CommandUpdateOne) SetKeyword(s string) *CommandUpdateOne {
 	cuo.mutation.SetKeyword(s)
+	return cuo
+}
+
+// SetLanguage sets the "language" field.
+func (cuo *CommandUpdateOne) SetLanguage(s string) *CommandUpdateOne {
+	cuo.mutation.SetLanguage(s)
+	return cuo
+}
+
+// SetNillableLanguage sets the "language" field if the given value is not nil.
+func (cuo *CommandUpdateOne) SetNillableLanguage(s *string) *CommandUpdateOne {
+	if s != nil {
+		cuo.SetLanguage(*s)
+	}
 	return cuo
 }
 
@@ -607,6 +642,13 @@ func (cuo *CommandUpdateOne) sqlSave(ctx context.Context) (_node *Command, err e
 			Type:   field.TypeString,
 			Value:  value,
 			Column: command.FieldKeyword,
+		})
+	}
+	if value, ok := cuo.mutation.Language(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: command.FieldLanguage,
 		})
 	}
 	if value, ok := cuo.mutation.Detail(); ok {

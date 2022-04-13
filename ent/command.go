@@ -18,6 +18,8 @@ type Command struct {
 	ID string `json:"id,omitempty"`
 	// Keyword holds the value of the "keyword" field.
 	Keyword string `json:"keyword,omitempty"`
+	// Language holds the value of the "language" field.
+	Language string `json:"language,omitempty"`
 	// Detail holds the value of the "detail" field.
 	Detail string `json:"detail,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
@@ -58,7 +60,7 @@ func (*Command) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case command.FieldID, command.FieldKeyword, command.FieldDetail, command.FieldCreator, command.FieldServer, command.FieldCode:
+		case command.FieldID, command.FieldKeyword, command.FieldLanguage, command.FieldDetail, command.FieldCreator, command.FieldServer, command.FieldCode:
 			values[i] = new(sql.NullString)
 		case command.FieldCreatedAt, command.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -88,6 +90,12 @@ func (c *Command) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field keyword", values[i])
 			} else if value.Valid {
 				c.Keyword = value.String
+			}
+		case command.FieldLanguage:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field language", values[i])
+			} else if value.Valid {
+				c.Language = value.String
 			}
 		case command.FieldDetail:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -160,6 +168,8 @@ func (c *Command) String() string {
 	builder.WriteString(fmt.Sprintf("id=%v", c.ID))
 	builder.WriteString(", keyword=")
 	builder.WriteString(c.Keyword)
+	builder.WriteString(", language=")
+	builder.WriteString(c.Language)
 	builder.WriteString(", detail=")
 	builder.WriteString(c.Detail)
 	builder.WriteString(", created_at=")

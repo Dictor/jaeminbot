@@ -13,6 +13,8 @@ const (
 	FieldID = "id"
 	// FieldKeyword holds the string denoting the keyword field in the database.
 	FieldKeyword = "keyword"
+	// FieldLanguage holds the string denoting the language field in the database.
+	FieldLanguage = "language"
 	// FieldDetail holds the string denoting the detail field in the database.
 	FieldDetail = "detail"
 	// FieldCreatedAt holds the string denoting the created_at field in the database.
@@ -40,6 +42,7 @@ const (
 var Columns = []string{
 	FieldID,
 	FieldKeyword,
+	FieldLanguage,
 	FieldDetail,
 	FieldCreatedAt,
 	FieldUpdatedAt,
@@ -67,6 +70,8 @@ func ValidColumn(column string) bool {
 var (
 	// KeywordValidator is a validator for the "keyword" field. It is called by the builders before save.
 	KeywordValidator func(string) error
+	// DefaultLanguage holds the default value on creation for the "language" field.
+	DefaultLanguage string
 	// DefaultCreatedAt holds the default value on creation for the "created_at" field.
 	DefaultCreatedAt func() time.Time
 	// DefaultUpdatedAt holds the default value on creation for the "updated_at" field.

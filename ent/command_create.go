@@ -27,6 +27,20 @@ func (cc *CommandCreate) SetKeyword(s string) *CommandCreate {
 	return cc
 }
 
+// SetLanguage sets the "language" field.
+func (cc *CommandCreate) SetLanguage(s string) *CommandCreate {
+	cc.mutation.SetLanguage(s)
+	return cc
+}
+
+// SetNillableLanguage sets the "language" field if the given value is not nil.
+func (cc *CommandCreate) SetNillableLanguage(s *string) *CommandCreate {
+	if s != nil {
+		cc.SetLanguage(*s)
+	}
+	return cc
+}
+
 // SetDetail sets the "detail" field.
 func (cc *CommandCreate) SetDetail(s string) *CommandCreate {
 	cc.mutation.SetDetail(s)
@@ -179,6 +193,10 @@ func (cc *CommandCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (cc *CommandCreate) defaults() {
+	if _, ok := cc.mutation.Language(); !ok {
+		v := command.DefaultLanguage
+		cc.mutation.SetLanguage(v)
+	}
 	if _, ok := cc.mutation.CreatedAt(); !ok {
 		v := command.DefaultCreatedAt()
 		cc.mutation.SetCreatedAt(v)
@@ -198,6 +216,9 @@ func (cc *CommandCreate) check() error {
 		if err := command.KeywordValidator(v); err != nil {
 			return &ValidationError{Name: "keyword", err: fmt.Errorf(`ent: validator failed for field "keyword": %w`, err)}
 		}
+	}
+	if _, ok := cc.mutation.Language(); !ok {
+		return &ValidationError{Name: "language", err: errors.New(`ent: missing required field "language"`)}
 	}
 	if _, ok := cc.mutation.CreatedAt(); !ok {
 		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "created_at"`)}
@@ -263,6 +284,14 @@ func (cc *CommandCreate) createSpec() (*Command, *sqlgraph.CreateSpec) {
 			Column: command.FieldKeyword,
 		})
 		_node.Keyword = value
+	}
+	if value, ok := cc.mutation.Language(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: command.FieldLanguage,
+		})
+		_node.Language = value
 	}
 	if value, ok := cc.mutation.Detail(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

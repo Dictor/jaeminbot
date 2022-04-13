@@ -12,6 +12,7 @@ var (
 	CommandsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeString, Unique: true},
 		{Name: "keyword", Type: field.TypeString},
+		{Name: "language", Type: field.TypeString, Default: "javascript"},
 		{Name: "detail", Type: field.TypeString, Nullable: true},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},

@@ -19,6 +19,8 @@ func (Command) Fields() []ent.Field {
 		field.String("id").Unique(),
 		field.String("keyword").
 			NotEmpty(),
+		field.String("language").
+			Default("javascript"),
 		field.String("detail").
 			Optional(),
 		field.Time("created_at").
