@@ -246,6 +246,8 @@ func discordMessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 				Message: m,
 				Command: cmd,
 			}, arg)
+		default:
+			logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("명령어의 명령 형식이 `%s`로 올바르지 않아요.:sob:", cmd.Language)))
 		}
 		if err != nil {
 			discordErrorHandler(s, m, err)

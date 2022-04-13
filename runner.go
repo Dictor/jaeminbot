@@ -35,14 +35,13 @@ func runPythonCode(ctx vmMessageContext, args []string) error {
 
 	mainModule, err := pyCtx.GetModule("main")
 	if err != nil {
-		return nil
+		return err
 	}
 
-	/*
-		send := func(msg string) {
-			vmMessageSender(ctx, msg)
-		}
-	*/
+	send := func(msg string) {
+		vmMessageSender(ctx, msg)
+	}
+	py.SetAttrString(mainModule.Globals, "jaemin_send", py.MustNewMethod("jaemin_send", send, 0, ""))
 
 	result, err := mainModule.Context.RunCode(code, mainModule.Globals, mainModule.GetDict(), nil)
 	if err != nil {
