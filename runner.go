@@ -7,7 +7,7 @@ import (
 
 	// This initializes gpython for runtime execution and is critical.
 	// It defines forward-declared symbols and registers native built-in modules, such as sys and time.
-	//_ "github.com/go-python/gpython/stdlib"
+	_ "github.com/go-python/gpython/modules"
 
 	// This is the primary import for gpython.
 	// It contains all symbols needed to fully compile and run python.
