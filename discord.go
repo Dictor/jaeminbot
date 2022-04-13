@@ -101,14 +101,10 @@ func discordMessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 			Type:  discordgo.EmbedTypeRich,
 			Title: "재민쿤 명령어",
 			Fields: []*discordgo.MessageEmbedField{
-				{Name: "도움말", Value: "`재민쿤`", Inline: true},
-				{Name: "명령어 목록", Value: "`재민쿤 명령어`", Inline: true},
-				{Name: "명령어 추가", Value: "`재민쿤 명령어 추가`", Inline: true},
-				{Name: "명령어 코드 수정", Value: "`재민쿤 명령어 코드 <명령어>`", Inline: true},
-				{Name: "명령어 정보", Value: "`재민쿤 <명령어>`", Inline: true},
-				{Name: "명령어 실행", Value: "`재민쿤 <명령어> [인수1] [인수2]...`", Inline: true},
+				{Name: "사용법", Value: "예를 들어 `안녕`이라는 명령어를 추가해볼까요? 첫번째로, `재민쿤 명령어 추가 안녕`을 입력하여 명령어를 추가해주세요. 두번째로, `재민쿤 명령어 코드 안녕`을 입력해 `안녕` 명령어를 호출하면 실행할 코드를 입력해주세요. 이때 코드는 아래 사진과 같이 제 메세지에 답장 버튼을 누르고 입력해주셔야해요. 마지막으로, `재민쿤 명령어 저장`을 입력하면 명령어 등록이 끝나요. 명령어를 사용하려면 `재민쿤 안녕`이라고 불러주시면 되요.", Inline: false},
+				{Name: "명령어", Value: "- `재민쿤 명령어 추가 <명령어>` : 명령어 추가\n -`재민쿤 명령어 코드 <명령어>` : 코드 작성\n - `재민쿤 명령어 저장 <python 또는 javascript>` : 명령어 저장", Inline: false},
 			},
-			Description: "원하는 기능의 명령어를 채팅방에 입력하면 됩니다. (<>는 필수, []는 선택 입력 항목입니다.)",
+			Description: "안녕하세요! 저는 어떤 코드라도 척척 실행해내는 석박사통합과정생 김재민이에요. ",
 		}))
 		return
 	case 2:
@@ -144,30 +140,7 @@ func discordMessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 				logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, "명령어 추가는 `재민쿤 명령어 추가 <명령어 호출 키워드>`로 가능합니다."))
 				return
 			case "저장":
-				editCtx, ok := editMessage[m.Author.ID]
-				if !ok {
-					logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, "편집 중인 명령어가 없습니다!"))
-					return
-				}
-				exist, cmd, err := getCommandByKeyword(editCtx.Keyword, m.GuildID)
-				if !exist {
-					logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, "어라? 편집 중이던 명령어를 찾을 수 없습니다!"))
-					discordErrorHandler(s, m, err)
-					delete(editMessage, m.Author.ID)
-					return
-				}
-				msg, err := findCodeReply(s, m, editCtx)
-				if err != nil {
-					discordErrorHandler(s, m, err)
-					return
-				}
-
-				newCmd, err := cmd.Update().SetCode(msg.Content).Save(ClientContext)
-				if err != nil {
-					discordErrorHandler(s, m, err)
-					return
-				}
-				logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%d 바이트의 용량의 코드로 `%s` 명령어를 업데이트 했습니다.", len(newCmd.Code), newCmd.Keyword)))
+				logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, "명령어 저장은 코드를 답글로 입력한 후 `재민쿤 명령어 저장 <javascript 또는 python>`로 가능합니다."))
 				return
 			}
 		}
@@ -216,17 +189,57 @@ func discordMessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 					Keyword:         msg[3],
 				}
 				return
+			case "저장":
+				editCtx, ok := editMessage[m.Author.ID]
+				if !ok {
+					logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, "편집 중인 명령어가 없습니다!"))
+					return
+				}
+				exist, cmd, err := getCommandByKeyword(editCtx.Keyword, m.GuildID)
+				if !exist {
+					logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, "어라? 편집 중이던 명령어를 찾을 수 없습니다!"))
+					discordErrorHandler(s, m, err)
+					delete(editMessage, m.Author.ID)
+					return
+				}
+				rmsg, err := findCodeReply(s, m, editCtx)
+				if err != nil {
+					discordErrorHandler(s, m, err)
+					return
+				}
+
+				if msg[3] != "javascript" && msg[3] != "python" {
+					logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, "언어는 `python` 또는 `javascript`여야 합니다."))
+					return
+				}
+				newCmd, err := cmd.Update().SetCode(rmsg.Content).SetLanguage(msg[3]).Save(ClientContext)
+				if err != nil {
+					discordErrorHandler(s, m, err)
+					return
+				}
+				logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%d 바이트의 용량의 코드로 `%s` 명령어를 업데이트 했습니다.", len(newCmd.Code), newCmd.Keyword)))
+				return
 			}
 		}
 	}
 	exist, cmd, _ := getCommandByKeyword(msg[1], m.GuildID)
+	var err error
 	if exist {
 		arg := msg[2:]
-		err := runCode(vmMessageContext{
-			Session: s,
-			Message: m,
-			Command: cmd,
-		}, arg)
+		switch cmd.Language {
+		case "javascript":
+			err = runJavascriptCode(vmMessageContext{
+				Session: s,
+				Message: m,
+				Command: cmd,
+			}, arg)
+		case "python":
+			err = runPythonCode(vmMessageContext{
+				Session: s,
+				Message: m,
+				Command: cmd,
+			}, arg)
+		}
 		if err != nil {
 			discordErrorHandler(s, m, err)
 		}
