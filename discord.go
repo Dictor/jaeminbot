@@ -138,6 +138,7 @@ func discordMessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 				Fields: []*discordgo.MessageEmbedField{
 					{Name: "버전", Value: fmt.Sprintf("`%s (%s) - %s`", gitTag, gitHash[0:6], buildDate), Inline: false},
 				}}))
+			return
 		}
 	case 3:
 		switch msg[1] {
