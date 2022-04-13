@@ -4,8 +4,14 @@ import (
 	"fmt"
 
 	"github.com/dop251/goja"
+
+	// This initializes gpython for runtime execution and is critical.
+	// It defines forward-declared symbols and registers native built-in modules, such as sys and time.
+	//_ "github.com/go-python/gpython/stdlib"
+
+	// This is the primary import for gpython.
+	// It contains all symbols needed to fully compile and run python.
 	"github.com/go-python/gpython/py"
-	_ "github.com/go-python/gpython/stdlib"
 )
 
 func runJavascriptCode(ctx vmMessageContext, args []string) error {
