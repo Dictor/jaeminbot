@@ -131,6 +131,13 @@ func discordMessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 		case "오류":
 			logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, "오류 확인 기능은 아직 준비중이에요!"))
 			return
+		case "정보":
+			logDiscordSendResult(s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
+				Type:  discordgo.EmbedTypeRich,
+				Title: "재민쿤 정보",
+				Fields: []*discordgo.MessageEmbedField{
+					{Name: "버전", Value: fmt.Sprintf("`%s (%s) - %s`", gitTag, gitHash[0:6], buildDate), Inline: false},
+				}}))
 		}
 	case 3:
 		switch msg[1] {
