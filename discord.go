@@ -137,6 +137,8 @@ func discordMessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 				Title: "재민쿤 정보",
 				Fields: []*discordgo.MessageEmbedField{
 					{Name: "버전", Value: fmt.Sprintf("`%s (%s) - %s`", gitTag, gitHash[0:6], buildDate), Inline: false},
+					{Name: "파이썬 런타임", Value: "Python 3.4.0 Gpython v0.1.0", Inline: false},
+					{Name: "자바스크립트 런타임", Value: "ECMAScript 5.1 goja", Inline: false},
 				}}))
 			return
 		}
@@ -225,7 +227,7 @@ func discordMessageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 					discordErrorHandler(s, m, err)
 					return
 				}
-				logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%d 바이트의 용량의 코드로 `%s` 명령어를 업데이트 했습니다.", len(newCmd.Code), newCmd.Keyword)))
+				logDiscordSendResult(s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("%d 바이트의 용량의 코드로 `%s` 명령어를 업데이트 했습니다. 명령어는 %s 언어로 해석됩니다.", len(newCmd.Code), newCmd.Keyword, newCmd.Language)))
 				return
 			}
 		}

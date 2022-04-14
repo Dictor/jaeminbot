@@ -33,7 +33,7 @@ func runPythonCode(ctx vmMessageContext, args []string) error {
 		return err
 	}
 
-	mainModule, err := pyCtx.GetModule("__main__")
+	mainModule, err := pyCtx.ModuleInit(&py.ModuleImpl{CodeSrc: "print('jaeminbot running context ready!')"})
 	if err != nil {
 		return err
 	}
