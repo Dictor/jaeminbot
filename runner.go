@@ -38,10 +38,19 @@ func runPythonCode(ctx vmMessageContext, args []string) error {
 		return err
 	}
 
-	send := func(msg string) {
-		vmMessageSender(ctx, msg)
+	send := func(module py.Object, args py.Tuple) {
+		msg, ok := args[0].(py.String)
+		if !ok {
+			vmMessageSender(ctx, "jaemin_send의 첫번째 매개변수는 반드시 문자열이여야합니다!")
+			return
+		}
+		vmMessageSender(ctx, string(msg))
 	}
-	py.SetAttrString(mainModule.Globals, "jaemin_send", py.MustNewMethod("jaemin_send", send, 0, ""))
+	pysend, err := py.NewMethod("jaemin_send", send, 0, "")
+	if err != nil {
+		return err
+	}
+	py.SetAttrString(mainModule.Globals, "jaemin_send", pysend)
 
 	result, err := mainModule.Context.RunCode(code, mainModule.Globals, mainModule.GetDict(), nil)
 	if err != nil {
