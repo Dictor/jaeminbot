@@ -1,8 +1,6 @@
 package main
 
 import (
-	"fmt"
-
 	"github.com/dop251/goja"
 
 	// This initializes gpython for runtime execution and is critical.
@@ -52,10 +50,9 @@ func runPythonCode(ctx vmMessageContext, args []string) error {
 	}
 	py.SetAttrString(mainModule.Globals, "jaemin_send", pysend)
 
-	result, err := mainModule.Context.RunCode(code, mainModule.Globals, mainModule.GetDict(), nil)
+	_, err = mainModule.Context.RunCode(code, mainModule.Globals, mainModule.GetDict(), nil)
 	if err != nil {
 		return err
 	}
-	vmMessageSender(ctx, fmt.Sprintf("%s", result))
 	return nil
 }
