@@ -38,13 +38,13 @@ func runPythonCode(ctx vmMessageContext, args []string) error {
 		return err
 	}
 
-	send := func(module py.Object, args py.Tuple) {
+	send := func(module py.Object, args py.Tuple) (py.Object, error) {
 		msg, ok := args[0].(py.String)
 		if !ok {
-			vmMessageSender(ctx, "jaemin_send의 첫번째 매개변수는 반드시 문자열이여야합니다!")
-			return
+			return nil, py.ExceptionNewf(py.TypeError, "jaemin_send의 첫번째 매개변수는 반드시 문자열이여야합니다!")
 		}
 		vmMessageSender(ctx, string(msg))
+		return nil, nil
 	}
 	pysend, err := py.NewMethod("jaemin_send", send, 0, "")
 	if err != nil {
